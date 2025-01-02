@@ -1,6 +1,8 @@
 package com.example.demo.service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,16 +15,18 @@ import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.BookStore;
+import com.example.demo.model.Category;
 import com.example.demo.model.Publisher;
 import com.example.demo.repo.BookRepo;
+import com.example.demo.repo.CategoryRepo;
 import com.example.demo.repo.PublisherRepo;
 
 @Service
 public class BookService {
 
     @Autowired private BookRepo bookRepo;
-
     @Autowired private PublisherRepo publisherRepo;
+    @Autowired private CategoryRepo categoryRepo;
 
     //@Autowired private CategoryRepo categoryRepo;
     
@@ -40,10 +44,15 @@ public class BookService {
        
             /*  if(newBook.getPublisher() == null || !publisherRepo.existsById(newBook.getPublisher().getId()))
             throw new BusinessException("614","Publisher not found in the database"); */
+        Set<Category> categories = new HashSet<>();
         
-        /* for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
+        
+        for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
+            Category category = categoryRepo.findById(categoryDTO.getId())
+                .orElseThrow(() -> new BusinessException("615","Category not found in the database"));
             
-        } */
+            categories.add(category);
+        }
 
         BookStore book = new BookStore();
         book.setBookName(bookStoreDTO.getBookName());
@@ -56,6 +65,7 @@ public class BookService {
         book.setStock(bookStoreDTO.getStock());
         book.setYear(bookStoreDTO.getYear());
         book.setPublisher(publisher);
+        book.setCategories(categories);
         
         BookStore savedBook = bookRepo.save(book);
 
@@ -75,6 +85,17 @@ public class BookService {
         publisherDTO.setPublisherName(savedBook.getPublisher().getPublisherName());
 
         bookStoreDTO.setPublisherDTO(publisherDTO);
+
+        Set<CategoryDTO> savedCategories = new HashSet<>();
+
+        for(Category category : savedBook.getCategories()){
+            CategoryDTO categoriesDto = new CategoryDTO();
+            categoriesDto.setId(category.getId());
+            categoriesDto.setCategoryName(category.getCategoryName());
+            savedCategories.add(categoriesDto);
+        }
+
+        bookStoreDTO.setCategoriesDTO(savedCategories);
     
         return bookStoreDTO;
     }
@@ -84,11 +105,10 @@ public class BookService {
             new BusinessException("602", "Given book id does not found"));
     }
 
-    public BookStore updateBook(int id, BookStore book) {
+    public BookStore updateBook(int id, BookStoreDTO bookDTO) {
         BookStore matchingBook = getBook(id);
-        matchingBook.setBookName(book.getBookName());
-        matchingBook.setAuthorName(book.getAuthorName());
-        matchingBook.setPrice(book.getPrice());
+        matchingBook.setPrice(bookDTO.getPrice());
+        matchingBook.setStock(bookDTO.getStock());
         bookRepo.save(matchingBook);
         return matchingBook;
     }

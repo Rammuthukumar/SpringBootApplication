@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.model.Publisher;
 import com.example.demo.repo.PublisherRepo;
@@ -27,8 +28,16 @@ public class PublisherService {
         );
     }
 
-    public Publisher addPublisher(Publisher publisher){
-        return repo.save(publisher);
+    public PublisherDTO addPublisher(PublisherDTO publisherDTO){
+        Publisher publisher = new Publisher();
+        publisher.setPublisherName(publisherDTO.getPublisherName());
+
+        Publisher savedPublisher = repo.save(publisher);
+
+        publisherDTO.setId(savedPublisher.getId());
+        publisherDTO.setPublisherName(savedPublisher.getPublisherName());
+
+        return publisherDTO;
     }
 
     public String deletePublisher(int id){

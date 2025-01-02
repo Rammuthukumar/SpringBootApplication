@@ -20,5 +20,5 @@ public class BookStoreDTO {
     private int pages;
     private int stock;
     private PublisherDTO publisherDTO;
-   // private Set<CategoryDTO> categoriesDTO;
+    private Set<CategoryDTO> categoriesDTO;
 }

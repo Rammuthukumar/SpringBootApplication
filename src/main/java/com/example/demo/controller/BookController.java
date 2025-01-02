@@ -40,9 +40,8 @@ public class BookController {
     @PostMapping("/book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
-        System.out.println(bookDTO);
         // if(book.getPublisher() == null || (book.getPublisher().getId()))
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.addBook(bookDTO));
+        return new ResponseEntity<>(service.addBook(bookDTO),HttpStatus.CREATED);
     }
     
     @GetMapping("/book/{id}")
@@ -52,8 +51,8 @@ public class BookController {
 
     @PutMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStore book){
-        return new ResponseEntity<BookStore>(service.updateBook(id,book),HttpStatus.OK);
+    public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
+        return new ResponseEntity<BookStore>(service.updateBook(id,bookDTO),HttpStatus.OK);
     }
 
     @DeleteMapping("/book/{id}")

@@ -3,10 +3,6 @@ package com.example.demo.model;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -65,11 +61,11 @@ public class BookStore {
     @ManyToOne @JoinColumn(name = "publisher_id") 
     private Publisher publisher; 
 
-   /*  @ManyToMany 
+    @ManyToMany 
     @JoinTable(
         name = "book_category",
         joinColumns = @JoinColumn(name = "book_id"),
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> categories; */
+    private Set<Category> categories;
 }

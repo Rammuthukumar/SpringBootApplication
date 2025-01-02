@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.model.Publisher;
 import com.example.demo.service.PublisherService;
 
@@ -41,8 +42,8 @@ public class PublisherController {
     }
 
     @PostMapping
-    public ResponseEntity<Publisher> addPublisher(@Valid @RequestBody Publisher publisher){
-        return new ResponseEntity<>(service.addPublisher(publisher),HttpStatus.OK);
+    public ResponseEntity<PublisherDTO> addPublisher(@Valid @RequestBody PublisherDTO publisherDTO){
+        return new ResponseEntity<>(service.addPublisher(publisherDTO),HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
