@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -62,16 +63,13 @@ public class BookStore {
     private int stock;
 
     @ManyToOne @JoinColumn(name = "publisher_id") 
-    @JsonManagedReference
     private Publisher publisher; 
 
-    @ManyToMany 
+   /*  @ManyToMany 
     @JoinTable(
         name = "book_category",
         joinColumns = @JoinColumn(name = "book_id"),
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    @JsonBackReference
-    private Set<Category> categories;
-
+    private Set<Category> categories; */
 }

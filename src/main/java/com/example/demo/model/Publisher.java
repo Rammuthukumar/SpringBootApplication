@@ -3,6 +3,8 @@ package com.example.demo.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -32,11 +34,10 @@ public class Publisher {
      * JsonManagedReference have to be used with parent entity.
      * JsonBackReference have to be used with child entity.
      */
-    @OneToMany(mappedBy = "publisher" , cascade = CascadeType.PERSIST) 
-    @JsonBackReference
+   /*  @OneToMany(mappedBy = "publisher" , cascade = CascadeType.PERSIST) 
     //The Publisher table does not store a list of books directly; 
     //this is handled by the BookStore table using the foreign key.
 
     // the main reason for adding the list of BookStore entry is to take advantage of OOP and Bidirectional navigation.
-    private List<BookStore> books;
+    private List<BookStore> books; */
 }

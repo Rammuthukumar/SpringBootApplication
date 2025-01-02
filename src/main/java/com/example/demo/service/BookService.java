@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.DTO.BookStoreDTO;
+import com.example.demo.DTO.CategoryDTO;
+import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.BookStore;
@@ -17,11 +20,11 @@ import com.example.demo.repo.PublisherRepo;
 @Service
 public class BookService {
 
-    @Autowired
-    private BookRepo bookRepo;
+    @Autowired private BookRepo bookRepo;
 
-    @Autowired
-    private PublisherRepo publisherRepo;
+    @Autowired private PublisherRepo publisherRepo;
+
+    //@Autowired private CategoryRepo categoryRepo;
     
     public Page<BookStore> getAllBooks(Pageable pageable){
         Page<BookStore> books = bookRepo.findAll(pageable);
@@ -31,16 +34,49 @@ public class BookService {
         return books;
     }
 
-    public BookStore addBook(BookStore newBook) {
-        Publisher publisher = publisherRepo.findById(newBook.getPublisher().getId())
+    public BookStoreDTO addBook(BookStoreDTO bookStoreDTO) {
+        Publisher publisher = publisherRepo.findById(bookStoreDTO.getPublisherDTO().getId())
             .orElseThrow(() -> new BusinessException("614","Publisher not found in the database"));
        
             /*  if(newBook.getPublisher() == null || !publisherRepo.existsById(newBook.getPublisher().getId()))
             throw new BusinessException("614","Publisher not found in the database"); */
-
-        newBook.setPublisher(publisher);
         
-        return bookRepo.save(newBook);
+        /* for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
+            
+        } */
+
+        BookStore book = new BookStore();
+        book.setBookName(bookStoreDTO.getBookName());
+        book.setAuthorName(bookStoreDTO.getAuthorName());
+        book.setLanguage(bookStoreDTO.getLanguage());
+        book.setGenre(bookStoreDTO.getGenre());
+        book.setPublishedDate(bookStoreDTO.getPublishedDate());
+        book.setPages(bookStoreDTO.getPages());
+        book.setPrice(bookStoreDTO.getPrice());
+        book.setStock(bookStoreDTO.getStock());
+        book.setYear(bookStoreDTO.getYear());
+        book.setPublisher(publisher);
+        
+        BookStore savedBook = bookRepo.save(book);
+
+        bookStoreDTO.setId(savedBook.getId());
+        bookStoreDTO.setBookName(savedBook.getBookName());
+        bookStoreDTO.setAuthorName(savedBook.getAuthorName());
+        bookStoreDTO.setLanguage(savedBook.getLanguage());
+        bookStoreDTO.setGenre(savedBook.getGenre());
+        bookStoreDTO.setPublishedDate(savedBook.getPublishedDate());
+        bookStoreDTO.setPages(savedBook.getPages());
+        bookStoreDTO.setPrice(savedBook.getPrice());
+        bookStoreDTO.setStock(savedBook.getStock());
+        bookStoreDTO.setYear(savedBook.getYear());
+        
+        PublisherDTO publisherDTO = new PublisherDTO();
+        publisherDTO.setId(savedBook.getPublisher().getId());
+        publisherDTO.setPublisherName(savedBook.getPublisher().getPublisherName());
+
+        bookStoreDTO.setPublisherDTO(publisherDTO);
+    
+        return bookStoreDTO;
     }
 
     public BookStore getBook(int id) {

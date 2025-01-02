@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.DTO.BookStoreDTO;
 import com.example.demo.model.BookStore;
 import com.example.demo.service.BookService;
 
@@ -39,9 +39,10 @@ public class BookController {
 
     @PostMapping("/book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> addBook(@Valid @RequestBody BookStore book, BindingResult result) {
+    public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
+        System.out.println(bookDTO);
         // if(book.getPublisher() == null || (book.getPublisher().getId()))
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.addBook(book));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.addBook(bookDTO));
     }
     
     @GetMapping("/book/{id}")

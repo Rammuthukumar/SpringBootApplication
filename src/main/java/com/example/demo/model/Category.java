@@ -2,6 +2,8 @@ package com.example.demo.model;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -22,6 +24,6 @@ public class Category {
 
     private String categoryName;
 
-    @ManyToMany(mappedBy = "categories") @JsonManagedReference
-    private Set<BookStore> books;  
+   /*  @ManyToMany(mappedBy = "categories")
+    private Set<BookStore> books;   */
 }
