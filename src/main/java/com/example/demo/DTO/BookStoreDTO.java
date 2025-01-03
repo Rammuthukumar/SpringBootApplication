@@ -3,8 +3,6 @@ package com.example.demo.DTO;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.example.demo.model.Category;
-
 import lombok.Data;
 
 @Data
