@@ -14,6 +14,7 @@ import com.example.demo.DTO.CategoryDTO;
 import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.mapper.EntityMapper;
 import com.example.demo.model.BookStore;
 import com.example.demo.model.Category;
 import com.example.demo.model.Publisher;
@@ -27,6 +28,7 @@ public class BookService {
     @Autowired private BookRepo bookRepo;
     @Autowired private PublisherRepo publisherRepo;
     @Autowired private CategoryRepo categoryRepo;
+    @Autowired private EntityMapper entityMapper;
 
     //@Autowired private CategoryRepo categoryRepo;
     
@@ -42,11 +44,8 @@ public class BookService {
         Publisher publisher = publisherRepo.findById(bookStoreDTO.getPublisherDTO().getId())
             .orElseThrow(() -> new BusinessException("614","Publisher not found in the database"));
        
-            /*  if(newBook.getPublisher() == null || !publisherRepo.existsById(newBook.getPublisher().getId()))
-            throw new BusinessException("614","Publisher not found in the database"); */
         Set<Category> categories = new HashSet<>();
-        
-        
+         
         for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
             Category category = categoryRepo.findById(categoryDTO.getId())
                 .orElseThrow(() -> new BusinessException("615","Category not found in the database"));
@@ -54,32 +53,14 @@ public class BookService {
             categories.add(category);
         }
 
-        BookStore book = new BookStore();
-        book.setBookName(bookStoreDTO.getBookName());
-        book.setAuthorName(bookStoreDTO.getAuthorName());
-        book.setLanguage(bookStoreDTO.getLanguage());
-        book.setGenre(bookStoreDTO.getGenre());
-        book.setPublishedDate(bookStoreDTO.getPublishedDate());
-        book.setPages(bookStoreDTO.getPages());
-        book.setPrice(bookStoreDTO.getPrice());
-        book.setStock(bookStoreDTO.getStock());
-        book.setYear(bookStoreDTO.getYear());
+        BookStore book = entityMapper.bookStoreDTOtoBookStore(bookStoreDTO);  // mapping dto to entity
         book.setPublisher(publisher);
         book.setCategories(categories);
         
-        BookStore savedBook = bookRepo.save(book);
+        BookStore savedBook = bookRepo.save(book);                            // saving entity data in db
 
-        bookStoreDTO.setId(savedBook.getId());
-        bookStoreDTO.setBookName(savedBook.getBookName());
-        bookStoreDTO.setAuthorName(savedBook.getAuthorName());
-        bookStoreDTO.setLanguage(savedBook.getLanguage());
-        bookStoreDTO.setGenre(savedBook.getGenre());
-        bookStoreDTO.setPublishedDate(savedBook.getPublishedDate());
-        bookStoreDTO.setPages(savedBook.getPages());
-        bookStoreDTO.setPrice(savedBook.getPrice());
-        bookStoreDTO.setStock(savedBook.getStock());
-        bookStoreDTO.setYear(savedBook.getYear());
-        
+        bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       // mapping saved entity to dto
+
         PublisherDTO publisherDTO = new PublisherDTO();
         publisherDTO.setId(savedBook.getPublisher().getId());
         publisherDTO.setPublisherName(savedBook.getPublisher().getPublisherName());
