@@ -5,7 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.DTO.BookStoreDTO;
+import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.model.BookStore;
+import com.example.demo.model.Publisher;
 
 @Component
 public class EntityMapper {
@@ -13,12 +15,18 @@ public class EntityMapper {
     @Autowired private ModelMapper modelMapper;
 
     public BookStoreDTO bookStoreToBookStoreDTO(BookStore bookStore){
-        BookStoreDTO bookStoreDTO = modelMapper.map(bookStore,BookStoreDTO.class);
-        return bookStoreDTO;
+        return modelMapper.map(bookStore,BookStoreDTO.class);
     }
 
     public BookStore bookStoreDTOtoBookStore(BookStoreDTO bookStoreDTO){
-        BookStore bookStore = modelMapper.map(bookStoreDTO,BookStore.class);
-        return bookStore;
+        return modelMapper.map(bookStoreDTO,BookStore.class); 
     } 
+
+    public PublisherDTO publisherToPublisherDTO(Publisher publisher){
+        return modelMapper.map(publisher,PublisherDTO.class);
+    }
+
+    public Publisher publisherDTOtoPublisher(PublisherDTO publisherDTO){
+        return modelMapper.map(publisherDTO,Publisher.class);
+    }
 }

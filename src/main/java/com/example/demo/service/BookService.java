@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,13 +32,31 @@ public class BookService {
     @Autowired private EntityMapper entityMapper;
 
     //@Autowired private CategoryRepo categoryRepo;
-    
-    public Page<BookStore> getAllBooks(Pageable pageable){
+    private List<BookStoreDTO> bookStoreList = new ArrayList<>();
+    private Set<CategoryDTO> savedCategoriesList = new HashSet<>();
+
+    public List<BookStoreDTO> getAllBooks(Pageable pageable){
         Page<BookStore> books = bookRepo.findAll(pageable);
+
         if(books.isEmpty()){
             throw new BusinessException("601","Repo is Empty, Please add some data");
         }
-        return books;
+
+        for(BookStore book : books){
+            BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
+            bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(book.getPublisher()));
+
+            for(Category category : book.getCategories()){
+                CategoryDTO categoriesDto = new CategoryDTO();
+                categoriesDto.setId(category.getId());
+                categoriesDto.setCategoryName(category.getCategoryName());
+                savedCategoriesList.add(categoriesDto);
+            }
+            bookStoreDTO.setCategoriesDTO(savedCategoriesList);
+            bookStoreList.add(bookStoreDTO);
+        }
+
+        return bookStoreList;
     }
 
     public BookStoreDTO addBook(BookStoreDTO bookStoreDTO) {
@@ -60,12 +79,7 @@ public class BookService {
         BookStore savedBook = bookRepo.save(book);                            // saving entity data in db
 
         bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       // mapping saved entity to dto
-
-        PublisherDTO publisherDTO = new PublisherDTO();
-        publisherDTO.setId(savedBook.getPublisher().getId());
-        publisherDTO.setPublisherName(savedBook.getPublisher().getPublisherName());
-
-        bookStoreDTO.setPublisherDTO(publisherDTO);
+        bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(savedBook.getPublisher()));  // mapping entity to dto
 
         Set<CategoryDTO> savedCategories = new HashSet<>();
 
@@ -81,17 +95,45 @@ public class BookService {
         return bookStoreDTO;
     }
 
-    public BookStore getBook(int id) {
-        return bookRepo.findById(id).orElseThrow(()->  
+    public BookStoreDTO getBook(int id) {
+        BookStore book = bookRepo.findById(id).orElseThrow(()->  
             new BusinessException("602", "Given book id does not found"));
+
+        BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
+        bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(book.getPublisher()));
+
+        for(Category category : book.getCategories()){
+            CategoryDTO categoriesDto = new CategoryDTO();
+            categoriesDto.setId(category.getId());
+            categoriesDto.setCategoryName(category.getCategoryName());
+            savedCategoriesList.add(categoriesDto);
+        }
+        bookStoreDTO.setCategoriesDTO(savedCategoriesList);
+
+        return bookStoreDTO;
     }
 
-    public BookStore updateBook(int id, BookStoreDTO bookDTO) {
-        BookStore matchingBook = getBook(id);
+    public BookStoreDTO updateBook(int id, BookStoreDTO bookDTO) {
+        BookStore matchingBook = bookRepo.findById(id).orElseThrow(() -> 
+            new BusinessException("602","Given book id does not found in the database"));
+
         matchingBook.setPrice(bookDTO.getPrice());
         matchingBook.setStock(bookDTO.getStock());
-        bookRepo.save(matchingBook);
-        return matchingBook;
+
+        matchingBook = bookRepo.save(matchingBook);
+
+        BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(matchingBook);
+        bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(matchingBook.getPublisher()));
+
+        for(Category category : matchingBook.getCategories()){
+            CategoryDTO categoriesDto = new CategoryDTO();
+            categoriesDto.setId(category.getId());
+            categoriesDto.setCategoryName(category.getCategoryName());
+            savedCategoriesList.add(categoriesDto);
+        }
+        bookStoreDTO.setCategoriesDTO(savedCategoriesList);
+
+        return bookStoreDTO;
     }
 
     public String deleteBook(int id) {

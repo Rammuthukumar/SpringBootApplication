@@ -3,7 +3,9 @@ package com.example.demo.model;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -61,7 +63,7 @@ public class BookStore {
     @ManyToOne @JoinColumn(name = "publisher_id") 
     private Publisher publisher; 
 
-    @ManyToMany 
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}) 
     @JoinTable(
         name = "book_category",
         joinColumns = @JoinColumn(name = "book_id"),

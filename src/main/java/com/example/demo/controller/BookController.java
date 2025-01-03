@@ -46,14 +46,14 @@ public class BookController {
     
     @GetMapping("/book/{id}")
     public ResponseEntity<?> getBook(@PathVariable int id){
-        return new ResponseEntity<BookStore>(service.getBook(id),HttpStatus.OK);
+        return new ResponseEntity<BookStoreDTO>(service.getBook(id),HttpStatus.OK);
     }
 
-    @PutMapping("/book/{id}")
+    /* @PutMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
+     public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
         return new ResponseEntity<BookStore>(service.updateBook(id,bookDTO),HttpStatus.OK);
-    }
+    } */
 
     @DeleteMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -64,8 +64,7 @@ public class BookController {
     @DeleteMapping("/book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<String> deleteAllBook(){
-        return new ResponseEntity<String>(service.deleteAllBook(),HttpStatus.OK);
-        
+        return new ResponseEntity<String>(service.deleteAllBook(),HttpStatus.OK); 
     }
 
     // Paging, Sorting and filtering
@@ -84,7 +83,7 @@ public class BookController {
         else if(authorName != null)
             return new ResponseEntity<Page<BookStore>>(service.searchByBook(authorName,pageable),HttpStatus.OK);
              
-        return new ResponseEntity<Page<BookStore>>(service.getAllBooks(pageable),HttpStatus.OK);
+        return new ResponseEntity<List<BookStoreDTO>>(service.getAllBooks(pageable),HttpStatus.OK);
      }
  
     
