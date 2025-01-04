@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
+import com.example.demo.mapper.EntityMapper;
 import com.example.demo.model.Publisher;
 import com.example.demo.repo.PublisherRepo;
 
@@ -14,6 +15,7 @@ import com.example.demo.repo.PublisherRepo;
 public class PublisherService {
     
     @Autowired private PublisherRepo repo;
+    @Autowired private EntityMapper entityMapper;
 
     public Page<Publisher> getAllPublisher(Pageable pageable){
         Page<Publisher> publishers = repo.findAll(pageable);
@@ -22,22 +24,18 @@ public class PublisherService {
         return publishers;
     }
     
-    public Publisher getPublisher(int id){
-        return repo.findById(id).orElseThrow(
+    public PublisherDTO getPublisher(int id){
+        Publisher publisher = repo.findById(id).orElseThrow(
             () -> new BusinessException("702","Cant find Publisher for the given id "+ id)
         );
+
+        return entityMapper.publisherToPublisherDTO(publisher);
     }
 
     public PublisherDTO addPublisher(PublisherDTO publisherDTO){
-        Publisher publisher = new Publisher();
-        publisher.setPublisherName(publisherDTO.getPublisherName());
+        Publisher publisher = entityMapper.publisherDTOtoPublisher(publisherDTO);
+        return entityMapper.publisherToPublisherDTO(repo.save(publisher));
 
-        Publisher savedPublisher = repo.save(publisher);
-
-        publisherDTO.setId(savedPublisher.getId());
-        publisherDTO.setPublisherName(savedPublisher.getPublisherName());
-
-        return publisherDTO;
     }
 
     public String deletePublisher(int id){

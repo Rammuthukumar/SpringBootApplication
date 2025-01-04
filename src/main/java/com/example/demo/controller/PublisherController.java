@@ -37,7 +37,7 @@ public class PublisherController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Publisher> getPublisher(@PathVariable int id){
+    public ResponseEntity<PublisherDTO> getPublisher(@PathVariable int id){
         return new ResponseEntity<>(service.getPublisher(id),HttpStatus.OK);
     }
 

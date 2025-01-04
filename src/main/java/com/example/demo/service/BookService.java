@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.DTO.BookStoreDTO;
 import com.example.demo.DTO.CategoryDTO;
-import com.example.demo.DTO.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.EntityMapper;
@@ -31,7 +30,6 @@ public class BookService {
     @Autowired private CategoryRepo categoryRepo;
     @Autowired private EntityMapper entityMapper;
 
-    //@Autowired private CategoryRepo categoryRepo;
     private List<BookStoreDTO> bookStoreList = new ArrayList<>();
     private Set<CategoryDTO> savedCategoriesList = new HashSet<>();
 

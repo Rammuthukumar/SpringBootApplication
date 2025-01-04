@@ -49,11 +49,11 @@ public class BookController {
         return new ResponseEntity<BookStoreDTO>(service.getBook(id),HttpStatus.OK);
     }
 
-    /* @PutMapping("/book/{id}")
+    @PutMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-     public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
-        return new ResponseEntity<BookStore>(service.updateBook(id,bookDTO),HttpStatus.OK);
-    } */
+    public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
+        return new ResponseEntity<BookStoreDTO>(service.updateBook(id,bookDTO),HttpStatus.OK);
+    } 
 
     @DeleteMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
