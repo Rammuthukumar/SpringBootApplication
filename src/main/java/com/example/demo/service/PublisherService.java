@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.DTO.PublisherDTO;
+import com.example.demo.dto.PublisherDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.mapper.EntityMapper;
 import com.example.demo.model.Publisher;

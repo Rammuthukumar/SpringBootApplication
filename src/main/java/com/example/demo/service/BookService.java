@@ -10,8 +10,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.DTO.BookStoreDTO;
-import com.example.demo.DTO.CategoryDTO;
+import com.example.demo.dto.BookStoreDTO;
+import com.example.demo.dto.CategoryDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.mapper.EntityMapper;

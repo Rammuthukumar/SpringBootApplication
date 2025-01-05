@@ -4,8 +4,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.DTO.BookStoreDTO;
-import com.example.demo.DTO.PublisherDTO;
+import com.example.demo.dto.BookStoreDTO;
+import com.example.demo.dto.PublisherDTO;
 import com.example.demo.model.BookStore;
 import com.example.demo.model.Publisher;
 

@@ -19,14 +19,9 @@ import jakarta.validation.Valid;
 @RequestMapping("/user")
 public class UserController {
     
-    @Autowired
-    private UserService service;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
+    @Autowired private UserService service;
+    @Autowired private JwtService jwtService;
+    @Autowired AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
     public User saveUser(@Valid @RequestBody User user){

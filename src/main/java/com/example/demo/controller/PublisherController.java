@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.PublisherDTO;
+import com.example.demo.dto.PublisherDTO;
 import com.example.demo.model.Publisher;
 import com.example.demo.service.PublisherService;
 
