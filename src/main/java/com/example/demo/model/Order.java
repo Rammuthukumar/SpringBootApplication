@@ -21,11 +21,11 @@ public class Order {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "book_id", referencedColumnName = "id" , insertable = false , updatable = false)
+    @JoinColumn(name = "book_id", referencedColumnName = "id" )
     private BookStore book;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id" , insertable = false , updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id" )
     private User user;
 
     @Min(1)
