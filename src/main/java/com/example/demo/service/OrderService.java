@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.dto.BookResponseDTO;
 import com.example.demo.dto.OrderDTO;
+import com.example.demo.dto.OrderResponseDTO;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.model.BookStore;
 import com.example.demo.model.Order;
@@ -65,16 +67,37 @@ public class OrderService {
         return orders;
     }
 
-    public List<Order> getOrders(int userId){
-        System.out.println(userId);
+    public List<OrderResponseDTO> getOrders(int userId){
         List<Order> orders = orderRepo.findAllByUserId(userId);
         if(orders.isEmpty())
             throw new BusinessException("803","Cant find Order list for the given user id");
 
-        return orders;
+        List<OrderResponseDTO> orderResponseList = new ArrayList<>();
+
+        OrderResponseDTO orderResponse = new OrderResponseDTO();
+        BookResponseDTO bookResponse = new BookResponseDTO();
+    
+        for(Order order : orders){
+            orderResponse.setId(order.getId());
+
+            bookResponse.setId(order.getBook().getId());
+            bookResponse.setBookName(order.getBook().getBookName());
+            bookResponse.setAuthorName(order.getBook().getAuthorName());
+
+            orderResponse.setBookResponse(bookResponse);
+            orderResponse.setUserId(userId);
+            orderResponse.setQuantity(order.getQuantity());
+            orderResponse.setTotalPrice(order.getTotalPrice());
+
+            orderResponseList.add(orderResponse);
+        }
+
+        return orderResponseList;
+
+
     }
 
-    public Order updateOrder(OrderDTO orderDTO){
+    public OrderResponseDTO updateOrder(OrderDTO orderDTO){
         Order order = orderRepo.findById(orderDTO.getId()).orElseThrow(
             () -> new BusinessException("804","Cant find the Order for the given id")
         );
@@ -97,6 +120,17 @@ public class OrderService {
         order.setQuantity(newQuantity);
         order.setTotalPrice(newQuantity * book.getPrice());
 
-        return orderRepo.save(order);
+        Order savedOrder = orderRepo.save(order);
+        OrderResponseDTO orderResponse = new OrderResponseDTO();
+
+        orderResponse.setId(savedOrder.getId());
+        orderResponse.getBookResponse().setId(book.getId());
+        orderResponse.getBookResponse().setBookName(book.getBookName());
+        orderResponse.getBookResponse().setAuthorName(book.getAuthorName());
+        orderResponse.setUserId(orderDTO.getUserId());
+        orderResponse.setTotalPrice(order.getTotalPrice());
+        orderResponse.setQuantity(order.getQuantity());
+
+        return orderResponse;
     }
 }
