@@ -24,7 +24,6 @@ public class OrderService {
     private BookRepo bookRepo;
     private OrderRepo orderRepo;
     private UserRepo userRepo;
-    private BookService bookService;
 
     public OrderService(BookRepo bookRepo, OrderRepo orderRepo, UserRepo userRepo){
         this.bookRepo = bookRepo;
@@ -32,9 +31,13 @@ public class OrderService {
         this.userRepo = userRepo;
     }
     
-    private List<Order> orders = new ArrayList<>();
+    private List<OrderResponseDTO> ordersList = new ArrayList<>();
+
+    private OrderResponseDTO orderResponse = new OrderResponseDTO();
     
-    public List<Order> placeOrder(List<OrderDTO> ordersDTO){
+    public List<OrderResponseDTO> placeOrder(List<OrderDTO> ordersDTO){
+        BookResponseDTO bookResponse = new BookResponseDTO();
+        System.out.println("IN SERVICE LAYER");
         for(OrderDTO orderDTO : ordersDTO){
         
             BookStore book =  bookRepo.findById(orderDTO.getBookId()).orElseThrow(
@@ -52,19 +55,41 @@ public class OrderService {
 
             Order order = new Order();
             order.setUser(user);
-            order.setBook(book);
+           
             order.setQuantity(orderDTO.getQuantity());
             order.setTotalPrice(book.getPrice() * orderDTO.getQuantity());
 
             //After placing the order , Updating the stock of the book in db.
-            book.setStock(book.getStock() - order.getQuantity());  
-            bookRepo.save(book);
+            book.setStock(book.getStock() - order.getQuantity());
+            order.setBook(book);  
+            System.out.println("Saving book");
+            System.out.println(book);
+           // BookStore savedBook = bookRepo.save(book);
 
             //saving the order in db.
-            orders.add(orderRepo.save(order));
+            System.out.println("Saving order");
+            System.out.println(order);
+            Order savedOrder = orderRepo.save(order);
+            System.out.println("saved");
+            System.out.println(savedOrder);
+
+            orderResponse.setId(savedOrder.getId());
+
+            bookResponse.setId(savedOrder.getBook().getId());
+            bookResponse.setBookName(savedOrder.getBook().getBookName());
+            bookResponse.setAuthorName(savedOrder.getBook().getAuthorName());
+
+            orderResponse.setBookResponse(bookResponse);
+
+            orderResponse.setUserId(savedOrder.getUser().getId());
+            orderResponse.setQuantity(savedOrder.getQuantity());
+            orderResponse.setTotalPrice(savedOrder.getTotalPrice());
+            
+            ordersList.add(orderResponse);
+            
         }
 
-        return orders;
+        return ordersList;
     }
 
     public List<OrderResponseDTO> getOrders(int userId){
@@ -122,15 +147,30 @@ public class OrderService {
 
         Order savedOrder = orderRepo.save(order);
         OrderResponseDTO orderResponse = new OrderResponseDTO();
+        BookResponseDTO bookResponse = new BookResponseDTO();
 
         orderResponse.setId(savedOrder.getId());
-        orderResponse.getBookResponse().setId(book.getId());
-        orderResponse.getBookResponse().setBookName(book.getBookName());
-        orderResponse.getBookResponse().setAuthorName(book.getAuthorName());
+
+        bookResponse.setId(book.getId());
+        bookResponse.setBookName(book.getBookName());
+        bookResponse.setAuthorName(book.getAuthorName());
+
+        orderResponse.setBookResponse(bookResponse);
+
         orderResponse.setUserId(orderDTO.getUserId());
         orderResponse.setTotalPrice(order.getTotalPrice());
         orderResponse.setQuantity(order.getQuantity());
 
         return orderResponse;
+    }
+
+    public String cancelOrder(int orderId){
+        if(orderRepo.existsById(orderId)){
+            throw new BusinessException("806","Cant find order for the given id");
+        }
+
+        orderRepo.deleteById(orderId);
+
+        return "Successfully Deleted.";
     }
 }
