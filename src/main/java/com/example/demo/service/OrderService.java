@@ -36,43 +36,43 @@ public class OrderService {
     private OrderResponseDTO orderResponse = new OrderResponseDTO();
     
     public List<OrderResponseDTO> placeOrder(List<OrderDTO> ordersDTO){
+
         BookResponseDTO bookResponse = new BookResponseDTO();
-        System.out.println("IN SERVICE LAYER");
+
         for(OrderDTO orderDTO : ordersDTO){
-        
+            // Fetching Book.
             BookStore book =  bookRepo.findById(orderDTO.getBookId()).orElseThrow(
                 () -> new BusinessException("800","Cant find book in the database")
             );
 
+            //Checking the ordered Quantity is avaliable in stock.
             if(book.getStock() < orderDTO.getQuantity()) 
                 throw new BusinessException("801","Insufficent Stock");
 
+            // Fetching user.
             User user = userRepo.findById(orderDTO.getUserId()).orElseThrow(
                 () -> new BusinessException("802", "Cant find User in the database")
             );
 
-            // orderRepo.save(entityMapper.orderToOrderDTO(orderDTO.))
+            //Updating stock quantity.
+            book.setStock(book.getStock() - orderDTO.getQuantity());
+
+            BookStore savedBook = bookRepo.save(book);
+
+            System.out.println(savedBook.getCategories());
 
             Order order = new Order();
             order.setUser(user);
-           
+            order.setBook(book); 
             order.setQuantity(orderDTO.getQuantity());
             order.setTotalPrice(book.getPrice() * orderDTO.getQuantity());
-
-            //After placing the order , Updating the stock of the book in db.
-            book.setStock(book.getStock() - order.getQuantity());
-            order.setBook(book);  
-            System.out.println("Saving book");
-            System.out.println(book);
-           // BookStore savedBook = bookRepo.save(book);
-
-            //saving the order in db.
-            System.out.println("Saving order");
+            
             System.out.println(order);
-            Order savedOrder = orderRepo.save(order);
-            System.out.println("saved");
-            System.out.println(savedOrder);
 
+            //Saving the order in db.
+            Order savedOrder = orderRepo.save(order);
+            
+            //Mapping entity to dto.
             orderResponse.setId(savedOrder.getId());
 
             bookResponse.setId(savedOrder.getBook().getId());
@@ -85,6 +85,7 @@ public class OrderService {
             orderResponse.setQuantity(savedOrder.getQuantity());
             orderResponse.setTotalPrice(savedOrder.getTotalPrice());
             
+            //adding the dto obj to list.
             ordersList.add(orderResponse);
             
         }

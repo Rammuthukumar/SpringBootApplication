@@ -46,7 +46,8 @@ public class BookController {
     
     @GetMapping("/book/{id}")
     public ResponseEntity<?> getBook(@PathVariable int id){
-        return new ResponseEntity<BookStoreDTO>(service.getBook(id),HttpStatus.OK);
+        System.out.println(id);
+        return new ResponseEntity<BookStore>(service.getBook(id),HttpStatus.OK);
     }
 
     @PutMapping("/book/{id}")
@@ -71,9 +72,9 @@ public class BookController {
     @GetMapping("/book")
     public ResponseEntity<?> getAllBooks(
         @RequestParam(required=false) String bookName, @RequestParam(required=false) String authorName,
-        @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="5") int size,
+        @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="10") int size,
         @RequestParam(defaultValue = "id") String sort ) {
-         
+        System.out.println("hello");
         Pageable pageable = PageRequest.of(page,size,Sort.by(sort).ascending());
  
         if(bookName != null && authorName != null) 
@@ -105,7 +106,7 @@ public class BookController {
     public ResponseEntity<?> getBooksByPriceRange(
         @RequestParam double minPrice,
         @RequestParam double maxPrice,
-        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "5") int size,
         @RequestParam(defaultValue = "price") String sort,
         @RequestParam(defaultValue = "asc") String order) {
@@ -120,6 +121,14 @@ public class BookController {
     @GetMapping("/filter/author")
     public ResponseEntity<?> filterByAuthor(@RequestParam String authorName, @RequestParam int year){
         return new ResponseEntity<List<BookStore>>(service.filterByAuthor(authorName,year),HttpStatus.OK);
+    }
+
+    @PutMapping("/{bookId}/addCategory/{catId}")
+    public ResponseEntity<?> addCategory(
+        @PathVariable int bookId,
+        @PathVariable int catId
+    ) {
+        return new ResponseEntity<>(service.addCategory(bookId,catId),HttpStatus.OK);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.CascadeType;
@@ -63,11 +64,12 @@ public class BookStore {
     @ManyToOne @JoinColumn(name = "publisher_id") 
     private Publisher publisher; 
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}) 
+    @ManyToMany 
     @JoinTable(
         name = "book_category",
         joinColumns = @JoinColumn(name = "book_id"),
         inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> categories;
+    
+    private Set<Category> categories = new HashSet<>();
 }
