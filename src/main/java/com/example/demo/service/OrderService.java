@@ -3,7 +3,6 @@ package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.dto.BookResponseDTO;
@@ -14,7 +13,6 @@ import com.example.demo.model.BookStore;
 import com.example.demo.model.Order;
 import com.example.demo.model.User;
 import com.example.demo.repo.BookRepo;
-//import com.example.demo.repo.UserRepo;
 import com.example.demo.repo.OrderRepo;
 import com.example.demo.repo.UserRepo;
 

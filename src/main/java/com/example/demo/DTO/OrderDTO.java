@@ -8,5 +8,4 @@ public class OrderDTO {
     private int bookId;
     private int userId;
     private int quantity;
-    private double totalPrice;
 }
