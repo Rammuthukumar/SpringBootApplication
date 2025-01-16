@@ -16,24 +16,34 @@ import com.example.demo.repo.BookRepo;
 import com.example.demo.repo.OrderRepo;
 import com.example.demo.repo.UserRepo;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Service
 public class OrderService {
     
     private BookRepo bookRepo;
     private OrderRepo orderRepo;
     private UserRepo userRepo;
+    private JwtService jwtService;
 
-    public OrderService(BookRepo bookRepo, OrderRepo orderRepo, UserRepo userRepo){
+    public OrderService(BookRepo bookRepo, OrderRepo orderRepo, UserRepo userRepo,JwtService jwtService){
         this.bookRepo = bookRepo;
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
+        this.jwtService = jwtService;
     }
     
     private List<OrderResponseDTO> ordersList = new ArrayList<>();
 
     private OrderResponseDTO orderResponse = new OrderResponseDTO();
+
+    private String getUserNameFromToken(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        return jwtService.extractUserName(authHeader.substring(7));
+    }
+  
     
-    public List<OrderResponseDTO> placeOrder(List<OrderDTO> ordersDTO){
+    public List<OrderResponseDTO> placeOrder(List<OrderDTO> ordersDTO,HttpServletRequest request){
 
         BookResponseDTO bookResponse = new BookResponseDTO();
 
@@ -48,7 +58,7 @@ public class OrderService {
                 throw new BusinessException("801","Insufficent Stock");
 
             // Fetching user.
-            User user = userRepo.findByUsername(orderDTO.getUserName());
+            User user = userRepo.findByUsername(getUserNameFromToken(request));
 
             //Updating stock quantity.
             book.setStock(book.getStock() - orderDTO.getQuantity());
@@ -117,7 +127,8 @@ public class OrderService {
         return orderResponseList;
     }
 
-    public List<OrderResponseDTO> getUserOrders(String username){
+    public List<OrderResponseDTO> getUserOrders(HttpServletRequest request){
+        String username = getUserNameFromToken(request);
         List<Order> orders = orderRepo.findByUser_Username(username);
         
         if(orders.isEmpty())
@@ -145,10 +156,14 @@ public class OrderService {
         return orderResponseList;
     }
 
-    public OrderResponseDTO updateOrder(OrderDTO orderDTO){
+    public OrderResponseDTO updateOrder(OrderDTO orderDTO,HttpServletRequest request){
         Order order = orderRepo.findById(orderDTO.getId()).orElseThrow(
             () -> new BusinessException("804","Cant find the Order for the given id")
         );
+
+        if(!order.getUser().getUsername().equals(getUserNameFromToken(request))){
+            throw new BusinessException("808","You dont have access to change the order details");
+        }
 
         BookStore book = order.getBook();
         int newQuantity = orderDTO.getQuantity();
@@ -180,20 +195,24 @@ public class OrderService {
 
         orderResponse.setBookResponse(bookResponse);
 
-        orderResponse.setUserName(orderDTO.getUserName());
+        orderResponse.setUserName(getUserNameFromToken(request));
         orderResponse.setTotalPrice(order.getTotalPrice());
         orderResponse.setQuantity(order.getQuantity());
 
         return orderResponse;
     }
 
-    public String cancelOrder(int orderId){
-        if(orderRepo.existsById(orderId)){
-            throw new BusinessException("806","Cant find order for the given id");
+    public void cancelOrder(int orderId,HttpServletRequest request){
+        List<OrderResponseDTO> userOrders = getUserOrders(request);
+        boolean orderExists = true;
+
+        for(OrderResponseDTO order : userOrders){
+            if(orderId == order.getId()) orderExists = false;
         }
 
+        if(!orderExists){
+            throw new BusinessException("806","Cant find order for the given id");
+        }
         orderRepo.deleteById(orderId);
-
-        return "Successfully Deleted.";
     }
 }
