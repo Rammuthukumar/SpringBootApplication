@@ -9,5 +9,7 @@ import com.example.demo.model.Order;
 
 @Repository
 public interface OrderRepo extends JpaRepository<Order,Integer>{
-    List<Order> findAllByUserId(int userId);
+ //   List<Order> findAllByUserId(int userId);
+
+    List<Order> findByUser_Username(String username);
 }

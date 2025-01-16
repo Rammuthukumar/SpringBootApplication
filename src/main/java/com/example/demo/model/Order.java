@@ -25,7 +25,7 @@ public class Order {
     private BookStore book;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id" )
+    @JoinColumn(name = "username", referencedColumnName = "username" )
     private User user;
 
     @Min(1)

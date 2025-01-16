@@ -48,9 +48,7 @@ public class OrderService {
                 throw new BusinessException("801","Insufficent Stock");
 
             // Fetching user.
-            User user = userRepo.findById(orderDTO.getUserId()).orElseThrow(
-                () -> new BusinessException("802", "Cant find User in the database")
-            );
+            User user = userRepo.findByUsername(orderDTO.getUserName());
 
             //Updating stock quantity.
             book.setStock(book.getStock() - orderDTO.getQuantity());
@@ -79,7 +77,7 @@ public class OrderService {
 
             orderResponse.setBookResponse(bookResponse);
 
-            orderResponse.setUserId(savedOrder.getUser().getId());
+            orderResponse.setUserName(savedOrder.getUser().getUsername());
             orderResponse.setQuantity(savedOrder.getQuantity());
             orderResponse.setTotalPrice(savedOrder.getTotalPrice());
             
@@ -91,14 +89,14 @@ public class OrderService {
         return ordersList;
     }
 
-    public List<OrderResponseDTO> getOrders(int userId){
-        List<Order> orders = orderRepo.findAllByUserId(userId);
+    public List<OrderResponseDTO> getOrders(){
+        List<Order> orders = orderRepo.findAll();
+        
         if(orders.isEmpty())
-            throw new BusinessException("803","Cant find Order list for the given user id");
+            throw new BusinessException("803","Cant find Order list for the given id");
 
         List<OrderResponseDTO> orderResponseList = new ArrayList<>();
 
-        OrderResponseDTO orderResponse = new OrderResponseDTO();
         BookResponseDTO bookResponse = new BookResponseDTO();
     
         for(Order order : orders){
@@ -109,7 +107,7 @@ public class OrderService {
             bookResponse.setAuthorName(order.getBook().getAuthorName());
 
             orderResponse.setBookResponse(bookResponse);
-            orderResponse.setUserId(userId);
+            orderResponse.setUserName(order.getUser().getUsername());
             orderResponse.setQuantity(order.getQuantity());
             orderResponse.setTotalPrice(order.getTotalPrice());
 
@@ -117,8 +115,34 @@ public class OrderService {
         }
 
         return orderResponseList;
+    }
 
+    public List<OrderResponseDTO> getUserOrders(String username){
+        List<Order> orders = orderRepo.findByUser_Username(username);
+        
+        if(orders.isEmpty())
+            throw new BusinessException("803","Cant find Order list for the given id");
 
+        List<OrderResponseDTO> orderResponseList = new ArrayList<>();
+
+        BookResponseDTO bookResponse = new BookResponseDTO();
+    
+        for(Order order : orders){
+            orderResponse.setId(order.getId());
+
+            bookResponse.setId(order.getBook().getId());
+            bookResponse.setBookName(order.getBook().getBookName());
+            bookResponse.setAuthorName(order.getBook().getAuthorName());
+
+            orderResponse.setBookResponse(bookResponse);
+            orderResponse.setUserName(username);
+            orderResponse.setQuantity(order.getQuantity());
+            orderResponse.setTotalPrice(order.getTotalPrice());
+
+            orderResponseList.add(orderResponse);
+        }
+
+        return orderResponseList;
     }
 
     public OrderResponseDTO updateOrder(OrderDTO orderDTO){
@@ -156,7 +180,7 @@ public class OrderService {
 
         orderResponse.setBookResponse(bookResponse);
 
-        orderResponse.setUserId(orderDTO.getUserId());
+        orderResponse.setUserName(orderDTO.getUserName());
         orderResponse.setTotalPrice(order.getTotalPrice());
         orderResponse.setQuantity(order.getQuantity());
 

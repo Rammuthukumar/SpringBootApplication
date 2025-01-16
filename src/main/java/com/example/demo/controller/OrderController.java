@@ -30,8 +30,13 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getOrders(@RequestParam int userId){
-        return new ResponseEntity<>(orderService.getOrders(userId),HttpStatus.OK);
+    public ResponseEntity<?> getOrders(){
+        return new ResponseEntity<>(orderService.getOrders(),HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUserOrders(@PathVariable String username){
+        return new ResponseEntity<>(orderService.getUserOrders(username),HttpStatus.OK);
     }
 
     @PutMapping
