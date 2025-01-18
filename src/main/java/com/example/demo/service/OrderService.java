@@ -41,13 +41,12 @@ public class OrderService {
         String authHeader = request.getHeader("Authorization");
         return jwtService.extractUserName(authHeader.substring(7));
     }
-  
     
     public List<OrderResponseDTO> placeOrder(List<OrderDTO> ordersDTO,HttpServletRequest request){
 
         BookResponseDTO bookResponse = new BookResponseDTO();
 
-        for(OrderDTO orderDTO : ordersDTO){
+        ordersDTO.forEach(orderDTO->{
             // Fetching Book.
             BookStore book =  bookRepo.findById(orderDTO.getBookId()).orElseThrow(
                 () -> new BusinessException("800","Cant find book in the database")
@@ -94,7 +93,7 @@ public class OrderService {
             //adding the dto obj to list.
             ordersList.add(orderResponse);
             
-        }
+        });
 
         return ordersList;
     }
@@ -109,7 +108,7 @@ public class OrderService {
 
         BookResponseDTO bookResponse = new BookResponseDTO();
     
-        for(Order order : orders){
+        orders.forEach(order->{
             orderResponse.setId(order.getId());
 
             bookResponse.setId(order.getBook().getId());
@@ -122,7 +121,7 @@ public class OrderService {
             orderResponse.setTotalPrice(order.getTotalPrice());
 
             orderResponseList.add(orderResponse);
-        }
+        });
 
         return orderResponseList;
     }
@@ -138,7 +137,7 @@ public class OrderService {
 
         BookResponseDTO bookResponse = new BookResponseDTO();
     
-        for(Order order : orders){
+        orders.forEach(order->{
             orderResponse.setId(order.getId());
 
             bookResponse.setId(order.getBook().getId());
@@ -151,7 +150,7 @@ public class OrderService {
             orderResponse.setTotalPrice(order.getTotalPrice());
 
             orderResponseList.add(orderResponse);
-        }
+        });
 
         return orderResponseList;
     }
@@ -202,7 +201,7 @@ public class OrderService {
         return orderResponse;
     }
 
-    public void cancelOrder(int orderId,HttpServletRequest request){
+    /* public void cancelOrder(int orderId,HttpServletRequest request){
         List<OrderResponseDTO> userOrders = getUserOrders(request);
         boolean orderExists = true;
 
@@ -214,5 +213,23 @@ public class OrderService {
             throw new BusinessException("806","Cant find order for the given id");
         }
         orderRepo.deleteById(orderId);
+    } */
+
+    public void cancelOrder(int orderId, HttpServletRequest request) {
+        // Fetch user orders
+        List<OrderResponseDTO> userOrders = getUserOrders(request);
+    
+        // Check if the order exists using anyMatch for better readability
+        boolean orderExists = userOrders.stream()
+                                        .anyMatch(order -> orderId == order.getId());
+    
+        // Throw exception if order does not exist
+        if (!orderExists) {
+            throw new BusinessException("806", "Cannot find order for the given ID");
+        }
+    
+        // Delete the order
+        orderRepo.deleteById(orderId);
     }
+    
 }
