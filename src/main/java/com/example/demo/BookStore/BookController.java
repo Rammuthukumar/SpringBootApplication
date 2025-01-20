@@ -2,7 +2,6 @@ package com.example.demo.BookStore;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,14 +38,12 @@ public class BookController {
     @PostMapping("/book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
-        // if(book.getPublisher() == null || (book.getPublisher().getId()))
         return new ResponseEntity<>(service.addBook(bookDTO),HttpStatus.CREATED);
     }
     
     @GetMapping("/book/{id}")
     public ResponseEntity<?> getBook(@PathVariable int id){
-        System.out.println(id);
-        return new ResponseEntity<BookStore>(service.getBook(id),HttpStatus.OK);
+        return new ResponseEntity<BookStoreDTO>(service.getBook(id),HttpStatus.OK);
     }
 
     @PutMapping("/book/{id}")

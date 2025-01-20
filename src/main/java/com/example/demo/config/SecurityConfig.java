@@ -54,7 +54,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(customizer -> customizer.disable())
             .authorizeHttpRequests(request -> request
-                    .requestMatchers("user/register","user/login").permitAll()
+                    .requestMatchers("user/register","user/login","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/book/**").hasAnyRole("USER", "ADMIN") // GET accessible by USER and ADMIN
                     .requestMatchers(HttpMethod.POST, "/api/book").hasRole("ADMIN")              // POST restricted to ADMIN
                     .requestMatchers(HttpMethod.PUT, "/api/book/**").hasRole("ADMIN")            // PUT restricted to ADMIN

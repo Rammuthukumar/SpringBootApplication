@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.BookStore.BookRepo;
 import com.example.demo.BookStore.BookResponseDTO;
+import com.example.demo.BookStore.BookService;
 import com.example.demo.BookStore.BookStore;
 import com.example.demo.User.User;
 import com.example.demo.User.UserRepo;
@@ -18,20 +19,23 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class OrderService {
     
-    private BookRepo bookRepo;
+    private BookService bookService;
     private OrderRepo orderRepo;
     private UserRepo userRepo;
     private JwtService jwtService;
+    private BookRepo bookRepo;
 
-    public OrderService(BookRepo bookRepo, OrderRepo orderRepo, UserRepo userRepo,JwtService jwtService){
-        this.bookRepo = bookRepo;
+    public OrderService(BookService bookService,OrderRepo orderRepo,
+                        UserRepo userRepo,JwtService jwtService,
+                        BookRepo bookRepo){
+        this.bookService = bookService;
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
         this.jwtService = jwtService;
+        this.bookRepo = bookRepo;
     }
     
     private List<OrderResponseDTO> ordersList = new ArrayList<>();
-
     private OrderResponseDTO orderResponse = new OrderResponseDTO();
 
     private String getUserNameFromToken(HttpServletRequest request){
@@ -45,9 +49,7 @@ public class OrderService {
 
         ordersDTO.forEach(orderDTO->{
             // Fetching Book.
-            BookStore book =  bookRepo.findById(orderDTO.getBookId()).orElseThrow(
-                () -> new BusinessException("800","Cant find book in the database")
-            );
+            BookStore book =  bookService.getBookEntityById(orderDTO.getBookId());
 
             //Checking the ordered Quantity is avaliable in stock.
             if(book.getStock() < orderDTO.getQuantity()) 
@@ -61,15 +63,11 @@ public class OrderService {
 
             BookStore savedBook = bookRepo.save(book);
 
-            System.out.println(savedBook.getCategories());
-
             Order order = new Order();
             order.setUser(user);
-            order.setBook(book); 
+            order.setBook(savedBook); 
             order.setQuantity(orderDTO.getQuantity());
-            order.setTotalPrice(book.getPrice() * orderDTO.getQuantity());
-            
-            System.out.println(order);
+            order.setTotalPrice(savedBook.getPrice() * orderDTO.getQuantity());
 
             //Saving the order in db.
             Order savedOrder = orderRepo.save(order);

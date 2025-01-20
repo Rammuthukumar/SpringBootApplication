@@ -73,7 +73,6 @@ public class BookService {
             .orElseThrow(() -> new BusinessException("614","Publisher not found in the database"));
        
         Set<Category> categories = new HashSet<>();
-        System.out.println(bookStoreDTO.getCategoriesDTO());
         for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
             Category category = categoryRepo.findById(categoryDTO.getId())
                 .orElseThrow(() -> new BusinessException("615","Category not found in the database"));
@@ -84,23 +83,21 @@ public class BookService {
         BookStore book = entityMapper.bookStoreDTOtoBookStore(bookStoreDTO);  // mapping dto to entity
         book.setPublisher(publisher);
         book.setCategories(categories);
-
-        System.out.println(book);
         
         BookStore savedBook = bookRepo.save(book);                            // saving entity data in db
-        System.out.println(savedBook);
+
         bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       // mapping saved entity to dto
         bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(savedBook.getPublisher()));  // mapping entity to dto
 
         Set<CategoryDTO> savedCategories = new HashSet<>();
-        System.out.println(savedBook.getCategories());
+
         for(Category category : savedBook.getCategories()){
             CategoryDTO categoriesDto = new CategoryDTO();
             categoriesDto.setId(category.getId());
             categoriesDto.setCategoryName(category.getCategoryName());
             savedCategories.add(categoriesDto);
         }
-
+        
         bookStoreDTO.setCategoriesDTO(savedCategories);
     
         return bookStoreDTO;
@@ -134,26 +131,12 @@ public class BookService {
         it tries to access the toString() to serialize the category obj which eventaullay leads to infinite 
         cyclic access of data.
      */
-    @Transactional
-    public BookStore getBook(int id) {
-        BookStore book = bookRepo.findByIdWithCategories(id).orElseThrow(()->  
+    public BookStoreDTO getBook(int id) {
+        BookStore book = bookRepo.findById(id).orElseThrow(()->  
             new BusinessException("602", "Given book id does not found"));
-
-        System.out.println(book);
-        Hibernate.initialize(book.getCategories());
-        System.out.println(book.getCategories());
 
         BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
         bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(book.getPublisher()));
-
-        Set<Category> categories = book.getCategories();
-
-      
-        if (categories.isEmpty()) {
-            System.out.println("No categories found for book with id " + id);
-        } else {
-            categories.forEach(category -> System.out.println(category.getCategoryName()));
-        }
         
         for(Category category : book.getCategories()){
             CategoryDTO categoriesDto = new CategoryDTO();
@@ -163,8 +146,15 @@ public class BookService {
         }
         bookStoreDTO.setCategoriesDTO(savedCategoriesList);
 
-        return book;
+        return bookStoreDTO;
     }
+
+    public BookStore getBookEntityById(int id){
+        return bookRepo.findById(id).orElseThrow(
+            () -> new BusinessException("602","Given book is not found in db")
+        );
+    }
+    
 
     public BookStoreDTO updateBook(int id, BookStoreDTO bookDTO) {
         BookStore matchingBook = bookRepo.findById(id).orElseThrow(() -> 
