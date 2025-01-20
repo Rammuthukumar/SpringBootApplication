@@ -4,15 +4,19 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.demo.dto.BookStoreDTO;
-import com.example.demo.dto.PublisherDTO;
-import com.example.demo.model.BookStore;
-import com.example.demo.model.Publisher;
+import com.example.demo.BookStore.BookStore;
+import com.example.demo.BookStore.BookStoreDTO;
+import com.example.demo.Publisher.Publisher;
+import com.example.demo.Publisher.PublisherDTO;
 
 @Component
 public class EntityMapper {
 
-    @Autowired private ModelMapper modelMapper;
+    private ModelMapper modelMapper;
+
+    public EntityMapper(ModelMapper modelMapper){
+        this.modelMapper = modelMapper;
+    }
 
     public BookStoreDTO bookStoreToBookStoreDTO(BookStore bookStore){
         return modelMapper.map(bookStore,BookStoreDTO.class);
