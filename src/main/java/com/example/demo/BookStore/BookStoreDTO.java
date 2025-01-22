@@ -5,11 +5,12 @@ import java.util.Set;
 
 import com.example.demo.Category.CategoryDTO;
 import com.example.demo.Publisher.PublisherDTO;
+import java.io.Serializable;
 
 import lombok.Data;
 
 @Data
-public class BookStoreDTO {
+public class BookStoreDTO implements Serializable{
     private int id;
     private String bookName;
     private String authorName;

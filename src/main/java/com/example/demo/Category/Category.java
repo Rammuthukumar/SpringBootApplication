@@ -1,7 +1,10 @@
 package com.example.demo.Category;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.springframework.data.redis.core.RedisHash;
 
 import com.example.demo.BookStore.BookStore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,10 +19,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+@Entity 
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-public class Category {
+public class Category implements Serializable{
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

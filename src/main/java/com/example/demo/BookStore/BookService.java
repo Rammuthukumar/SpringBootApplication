@@ -7,6 +7,9 @@ import java.util.Set;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -68,10 +71,16 @@ public class BookService {
         return bookStoreList;
     }
 
+    // For storing the cache in redis, Whatever the object value we are returning it has to be 
+    // implement Serializable interface.
+    
+    @CachePut(value = "books", key = "#result.id")  
     public BookStoreDTO addBook(BookStoreDTO bookStoreDTO) {
         Publisher publisher = publisherRepo.findById(bookStoreDTO.getPublisherDTO().getId())
             .orElseThrow(() -> new BusinessException("614","Publisher not found in the database"));
-       
+        
+
+        System.out.println(bookStoreDTO);
         Set<Category> categories = new HashSet<>();
         for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
             Category category = categoryRepo.findById(categoryDTO.getId())
@@ -84,8 +93,9 @@ public class BookService {
         book.setPublisher(publisher);
         book.setCategories(categories);
         
+        System.out.println(book);
         BookStore savedBook = bookRepo.save(book);                            // saving entity data in db
-
+        System.out.println(savedBook);
         bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       // mapping saved entity to dto
         bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(savedBook.getPublisher()));  // mapping entity to dto
 
@@ -99,7 +109,7 @@ public class BookService {
         }
         
         bookStoreDTO.setCategoriesDTO(savedCategories);
-    
+        System.out.println(bookStoreDTO);
         return bookStoreDTO;
     }
  
@@ -131,9 +141,13 @@ public class BookService {
         it tries to access the toString() to serialize the category obj which eventaullay leads to infinite 
         cyclic access of data.
      */
+    
+    @Cacheable(value = "books", key = "#id")
     public BookStoreDTO getBook(int id) {
         BookStore book = bookRepo.findById(id).orElseThrow(()->  
             new BusinessException("602", "Given book id does not found"));
+
+        System.out.println("Method called");
 
         BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
         bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(book.getPublisher()));
@@ -145,7 +159,7 @@ public class BookService {
             savedCategoriesList.add(categoriesDto);
         }
         bookStoreDTO.setCategoriesDTO(savedCategoriesList);
-
+        System.out.println(book);
         return bookStoreDTO;
     }
 
@@ -155,7 +169,6 @@ public class BookService {
         );
     }
     
-
     public BookStoreDTO updateBook(int id, BookStoreDTO bookDTO) {
         BookStore matchingBook = bookRepo.findById(id).orElseThrow(() -> 
             new BusinessException("602","Given book id does not found in the database"));
@@ -179,6 +192,7 @@ public class BookService {
         return bookStoreDTO;
     }
 
+    @CacheEvict(value = "books",key = "#id")
     public String deleteBook(int id) {
         if(!bookRepo.existsById(id))
             throw new BusinessException("606","Given book id does not exist in the DataBase , please enter some valid id");
