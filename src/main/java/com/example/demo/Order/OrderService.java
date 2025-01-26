@@ -3,6 +3,8 @@ package com.example.demo.Order;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.BookStore.BookRepo;
@@ -38,6 +40,8 @@ public class OrderService {
     private List<OrderResponseDTO> ordersList = new ArrayList<>();
     private OrderResponseDTO orderResponse = new OrderResponseDTO();
 
+    private Logger logger = LoggerFactory.getLogger(OrderService.class);
+
     private String getUserNameFromToken(HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
         return jwtService.extractUserName(authHeader.substring(7));
@@ -62,6 +66,7 @@ public class OrderService {
             book.setStock(book.getStock() - orderDTO.getQuantity());
 
             BookStore savedBook = bookRepo.save(book);
+            logger.trace("Updated book quanity in database");
 
             Order order = new Order();
             order.setUser(user);
@@ -71,6 +76,7 @@ public class OrderService {
 
             //Saving the order in db.
             Order savedOrder = orderRepo.save(order);
+            logger.trace("order saved in database");
             
             //Mapping entity to dto.
             orderResponse.setId(savedOrder.getId());
