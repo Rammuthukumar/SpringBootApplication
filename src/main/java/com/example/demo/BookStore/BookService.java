@@ -5,17 +5,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.demo.Category.Category;
 import com.example.demo.Category.CategoryDTO;
@@ -148,6 +145,8 @@ public class BookService {
         BookStore book = bookRepo.findById(id).orElseThrow(()->  
             new BusinessException("602", "Given book id does not found"));
 
+        // book = bookRepo.findById(id).orElseThrow(()->  
+        //     new BusinessException("602", "Given book id does not found"));
         logger.trace("getBook() Method called");
 
         BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
@@ -174,7 +173,7 @@ public class BookService {
         BookStore matchingBook = bookRepo.findById(id).orElseThrow(() -> 
             new BusinessException("602","Given book id does not found in the database"));
 
-        matchingBook.setPrice(bookDTO.getPrice());
+        //matchingBook.setPrice(bookDTO.getPrice()+10);
         matchingBook.setStock(bookDTO.getStock());
 
         matchingBook = bookRepo.save(matchingBook);
