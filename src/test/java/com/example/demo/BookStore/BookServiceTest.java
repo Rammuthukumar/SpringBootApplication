@@ -23,7 +23,7 @@ import com.example.demo.Category.CategoryDTO;
 import com.example.demo.Publisher.Publisher;
 import com.example.demo.Publisher.PublisherDTO;
 import com.example.demo.exception.BusinessException;
-import com.example.demo.mapper.EntityMapper;
+import com.example.demo.utils.EntityMapper;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -204,9 +204,9 @@ class BookServiceTest {
         bookStoreDTO.setStock(10);
 
         when(bookRepo.findById(bookId)).thenReturn(Optional.of(book));
-        when(bookRepo.save(any(BookStore.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(bookRepo.save(book)).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(entityMapper.bookStoreToBookStoreDTO(any(BookStore.class))).thenReturn(bookStoreDTO);
+        when(entityMapper.bookStoreToBookStoreDTO(book)).thenReturn(bookStoreDTO);
         when(entityMapper.publisherToPublisherDTO(any())).thenReturn(new PublisherDTO());
 
         BookStoreDTO result = bookStoreService.updateBook(bookId, bookStoreDTO);

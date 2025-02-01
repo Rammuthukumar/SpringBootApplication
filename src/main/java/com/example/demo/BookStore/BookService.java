@@ -21,7 +21,7 @@ import com.example.demo.Publisher.Publisher;
 import com.example.demo.Publisher.PublisherRepo;
 import com.example.demo.exception.BusinessException;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.mapper.EntityMapper;
+import com.example.demo.utils.EntityMapper;
 
 @Service
 public class BookService {
@@ -173,7 +173,7 @@ public class BookService {
         BookStore matchingBook = bookRepo.findById(id).orElseThrow(() -> 
             new BusinessException("602","Given book id does not found in the database"));
 
-        //matchingBook.setPrice(bookDTO.getPrice()+10);
+        matchingBook.setPrice(bookDTO.getPrice());
         matchingBook.setStock(bookDTO.getStock());
 
         matchingBook = bookRepo.save(matchingBook);

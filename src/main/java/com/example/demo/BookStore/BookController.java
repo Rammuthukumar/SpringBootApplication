@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 import jakarta.validation.Valid;
 
@@ -40,20 +43,44 @@ public class BookController {
     @PostMapping("/book")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
-        return new ResponseEntity<>(service.addBook(bookDTO),HttpStatus.CREATED);
+        BookStoreDTO bookStoreResponse = service.addBook(bookDTO);
+        
+        Link addedBookLink = linkTo(methodOn(BookController.class)
+                            .getBook(bookStoreResponse.getId()))
+                            .withSelfRel();
+
+        bookStoreResponse.add(addedBookLink);
+
+        return new ResponseEntity<>(bookStoreResponse,HttpStatus.CREATED);
     }
     
     @GetMapping("/book/{id}")
     public ResponseEntity<?> getBook(@PathVariable int id){
-        BookStoreDTO bookStore = service.getBook(id);
-        System.out.println(bookStore);
-        return new ResponseEntity<BookStoreDTO>(bookStore,HttpStatus.OK);
+        BookStoreDTO bookStoreResponse = service.getBook(id);
+
+        //Link allBooksLink = Link.of("/api/book/").withRel("books").withType("GET");
+
+        Link allBooksLink = linkTo(methodOn(BookController.class)
+                            .getAllBooks(null, null, id, id, null))
+                            .withRel("books");
+                            
+        bookStoreResponse.add(allBooksLink);
+
+        return new ResponseEntity<>(bookStoreResponse,HttpStatus.OK);
     }
 
     @PutMapping("/book/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
-        return new ResponseEntity<BookStoreDTO>(service.updateBook(id,bookDTO),HttpStatus.OK);
+        BookStoreDTO bookStoreResponse = service.updateBook(id,bookDTO);
+
+        Link updatedBookLink = linkTo(methodOn(BookController.class)
+                            .getBook(bookStoreResponse.getId()))
+                            .withSelfRel();
+
+        bookStoreResponse.add(updatedBookLink);
+
+        return new ResponseEntity<BookStoreDTO>(bookStoreResponse,HttpStatus.OK);
     } 
 
     @DeleteMapping("/book/{id}")

@@ -1,4 +1,4 @@
-package com.example.demo.mapper;
+package com.example.demo.utils;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

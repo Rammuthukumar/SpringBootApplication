@@ -1,6 +1,7 @@
 package com.example.demo.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,14 +28,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@Valid @RequestBody User user){
+    public UserDTO login(@Valid @RequestBody User user){
         Authentication authentication = authenticationManager
             .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
 
         if(authentication.isAuthenticated()) {
-            return jwtService.createToken(user.getUsername());
+            String token = jwtService.createToken(user.getUsername());
+            Link orderLink = Link.of("/order/").withRel("order").withType("GET");
+
+            UserDTO userDTO = new UserDTO();
+            userDTO.setJwtToken(token);
+            userDTO.add(orderLink);
+
+            return userDTO;
         }
-        else return "Login Failed";
+        else return new UserDTO();
     }
     
 }

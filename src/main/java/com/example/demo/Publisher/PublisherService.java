@@ -1,12 +1,11 @@
 package com.example.demo.Publisher;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.exception.BusinessException;
-import com.example.demo.mapper.EntityMapper;
+import com.example.demo.utils.EntityMapper;
 
 @Service
 public class PublisherService {
