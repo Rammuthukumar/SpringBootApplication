@@ -30,12 +30,12 @@ public class OrderController {
         return new ResponseEntity<>(orderService.placeOrder(ordersDTO,request),HttpStatus.OK);
     }
 
-    // @GetMapping
-    // public ResponseEntity<?> getOrders(){
-    //     return new ResponseEntity<>(orderService.getOrders(),HttpStatus.OK);
-    // }
-
     @GetMapping
+    public ResponseEntity<?> getOrders(){
+        return new ResponseEntity<>(orderService.getOrders(),HttpStatus.OK);
+    }
+
+    @GetMapping("/user")
     public ResponseEntity<?> getUserOrders(HttpServletRequest request){
         return new ResponseEntity<>(orderService.getUserOrders(request),HttpStatus.OK);
     }

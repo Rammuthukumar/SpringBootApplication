@@ -47,7 +47,8 @@ public class BookController {
         
         Link addedBookLink = linkTo(methodOn(BookController.class)
                             .getBook(bookStoreResponse.getId()))
-                            .withSelfRel();
+                            .withSelfRel()
+                            .withType("GET");
 
         bookStoreResponse.add(addedBookLink);
 
@@ -62,7 +63,8 @@ public class BookController {
 
         Link allBooksLink = linkTo(methodOn(BookController.class)
                             .getAllBooks(null, null, id, id, null))
-                            .withRel("books");
+                            .withRel("books")
+                            .withType("GET");
                             
         bookStoreResponse.add(allBooksLink);
 
@@ -76,7 +78,8 @@ public class BookController {
 
         Link updatedBookLink = linkTo(methodOn(BookController.class)
                             .getBook(bookStoreResponse.getId()))
-                            .withSelfRel();
+                            .withSelfRel()
+                            .withType("GET");
 
         bookStoreResponse.add(updatedBookLink);
 
