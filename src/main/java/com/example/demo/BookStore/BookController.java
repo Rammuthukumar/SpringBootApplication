@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.config.AdminOnly;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
@@ -29,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api")
-@ResponseBody
 public class BookController {
 
     private BookService service;
@@ -41,7 +41,7 @@ public class BookController {
     // CRUD
 
     @PostMapping("/book")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminOnly           //custom annotation. referernce path : config/AdminOnly.java file.
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
         BookStoreDTO bookStoreResponse = service.addBook(bookDTO);
         
@@ -72,7 +72,7 @@ public class BookController {
     }
 
     @PutMapping("/book/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminOnly
     public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
         BookStoreDTO bookStoreResponse = service.updateBook(id,bookDTO);
 
@@ -87,13 +87,13 @@ public class BookController {
     } 
 
     @DeleteMapping("/book/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminOnly
     public ResponseEntity<?> deleteBook(@PathVariable int id){
         return new ResponseEntity<String>(service.deleteBook(id), HttpStatus.OK);
     }
 
     @DeleteMapping("/book")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @AdminOnly
     public ResponseEntity<String> deleteAllBook(){
         return new ResponseEntity<String>(service.deleteAllBook(),HttpStatus.OK); 
     }
