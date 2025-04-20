@@ -2,6 +2,8 @@ package com.example.demo.BookStore;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class BookController {
 
     private BookService service;
+    private static Logger logger = LoggerFactory.getLogger(BookController.class);
 
     public BookController(BookService service){
         this.service = service;
@@ -40,6 +45,7 @@ public class BookController {
 
     // CRUD
 
+    // adding new book
     @PostMapping("/book")
     @AdminOnly           //custom annotation. referernce path : config/AdminOnly.java file.
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
@@ -52,9 +58,10 @@ public class BookController {
 
         bookStoreResponse.add(addedBookLink);
 
-        return new ResponseEntity<>(bookStoreResponse,HttpStatus.CREATED);
+        return new ResponseEntity<BookStoreDTO>(bookStoreResponse,HttpStatus.CREATED);
     }
     
+    // getting book by id
     @GetMapping("/book/{id}")
     public ResponseEntity<?> getBook(@PathVariable int id){
         BookStoreDTO bookStoreResponse = service.getBook(id);
@@ -104,7 +111,7 @@ public class BookController {
         @RequestParam(required=false) String bookName, @RequestParam(required=false) String authorName,
         @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="10") int size,
         @RequestParam(defaultValue = "id") String sort ) {
-        System.out.println("hello");
+       
         Pageable pageable = PageRequest.of(page,size,Sort.by(sort).ascending());
  
         if(bookName != null && authorName != null) 
@@ -113,7 +120,8 @@ public class BookController {
             return new ResponseEntity<Page<BookStore>>(service.searchByAuthor(bookName,pageable),HttpStatus.OK);
         else if(authorName != null)
             return new ResponseEntity<Page<BookStore>>(service.searchByBook(authorName,pageable),HttpStatus.OK);
-             
+            
+        logger.trace("getAllBooks Controller method called");
         return new ResponseEntity<List<BookStoreDTO>>(service.getAllBooks(pageable),HttpStatus.OK);
      }
  

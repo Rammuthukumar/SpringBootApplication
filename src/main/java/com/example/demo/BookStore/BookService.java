@@ -44,7 +44,7 @@ public class BookService {
     private static Logger logger = LoggerFactory.getLogger(BookService.class);
 
     @Cacheable(value="books",key="#pageable")
-    public List<BookStoreDTO> getAllBooks(Pageable pageable){ 
+    public List<BookStoreDTO> getAllBooks(Pageable pageable){
         logger.trace("getAllBooks() : Mehod called");
         logger.trace("cache is empty,fetching data from database");
         Page<BookStore> books = bookRepo.findAll(pageable);
@@ -70,15 +70,20 @@ public class BookService {
         return bookStoreList;
     }
 
-    // For storing the cache in redis, Whatever the object value we are returning it has to be 
+    // For storing the data as cache in redis, Whatever the object value we are returning it has to be 
     // implement Serializable interface.
-    
+
+    // CachePut - adding new key:value pair in the memory.
     @CachePut(value = "book", key = "#result.id")  
     public BookStoreDTO addBook(BookStoreDTO bookStoreDTO) {
+
+        //Getting publisher data from db by using publisherId.
         Publisher publisher = publisherRepo.findById(bookStoreDTO.getPublisherDTO().getId())
             .orElseThrow(() -> new BusinessException("614","Publisher not found in the database"));
         
         Set<Category> categories = new HashSet<>();
+
+        //Getting Categories data from db by using categoriesId.
         for(CategoryDTO categoryDTO : bookStoreDTO.getCategoriesDTO()){
             Category category = categoryRepo.findById(categoryDTO.getId())
                 .orElseThrow(() -> new BusinessException("615","Category not found in the database"));
@@ -86,16 +91,18 @@ public class BookService {
             categories.add(category);
         }
 
-        BookStore book = entityMapper.bookStoreDTOtoBookStore(bookStoreDTO);  // mapping dto to entity
+        // mapping dto to entity
+        BookStore book = entityMapper.bookStoreDTOtoBookStore(bookStoreDTO);  
         book.setPublisher(publisher);
         book.setCategories(categories);
         
         logger.trace("saving book data in db",book);
-        BookStore savedBook = bookRepo.save(book);                            // saving entity data in db
+        BookStore savedBook = bookRepo.save(book);
         logger.trace("book saved in db",savedBook);
 
-        bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       // mapping saved entity to dto
-        bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(savedBook.getPublisher()));  // mapping entity to dto
+        // mapping saved entity to dto
+        bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(savedBook);       
+        bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(savedBook.getPublisher()));
 
         Set<CategoryDTO> savedCategories = new HashSet<>();
 
@@ -107,6 +114,7 @@ public class BookService {
         }
         
         bookStoreDTO.setCategoriesDTO(savedCategories);
+
         logger.trace("saving book data in cache");
         return bookStoreDTO;
     }
@@ -140,15 +148,19 @@ public class BookService {
         cyclic access of data.
      */
     
+    //Cacheable : checks if the books is exist in the cache memory for the given id before executing the method.
+    // if it is there it wont execute and return the book from the cache...
+    // if not the method will execute and stores the returning value in cache...
     @Cacheable(value = "book", key = "#id")
     public BookStoreDTO getBook(int id) {
+
+        //fetching book from db by id.
         BookStore book = bookRepo.findById(id).orElseThrow(()->  
             new BusinessException("602", "Given book id does not found"));
 
-        // book = bookRepo.findById(id).orElseThrow(()->  
-        //     new BusinessException("602", "Given book id does not found"));
         logger.trace("getBook() Method called");
 
+        // mapping entity to dto.
         BookStoreDTO bookStoreDTO = entityMapper.bookStoreToBookStoreDTO(book);
         bookStoreDTO.setPublisherDTO(entityMapper.publisherToPublisherDTO(book.getPublisher()));
         
@@ -158,6 +170,7 @@ public class BookService {
             categoriesDto.setCategoryName(category.getCategoryName());
             savedCategoriesList.add(categoriesDto);
         }
+        
         bookStoreDTO.setCategoriesDTO(savedCategoriesList);
         return bookStoreDTO;
     }

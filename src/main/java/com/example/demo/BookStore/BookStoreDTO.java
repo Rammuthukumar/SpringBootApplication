@@ -16,6 +16,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
+
+// RepresentationalModel -> for HateOAS
+// Serializable -> Caching obj should be serialiazable (Redis Caching)
 public class BookStoreDTO extends RepresentationModel<BookStoreDTO> implements Serializable{
     private int id;
     private String bookName;

@@ -2,8 +2,11 @@ package com.example.demo.Order;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,17 +20,20 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/order")
+@CrossOrigin(origins = "http://localhost:5173")
 public class OrderController {
     
     private OrderService orderService;
+    private Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     public OrderController(OrderService orderService){
         this.orderService = orderService;
     }
     
     @PostMapping
-    public ResponseEntity<?> placeOrder(@RequestBody List<OrderDTO> ordersDTO,HttpServletRequest request){
-        return new ResponseEntity<>(orderService.placeOrder(ordersDTO,request),HttpStatus.OK);
+    public ResponseEntity<?> placeOrder(@RequestBody OrderDTO orderDTO,HttpServletRequest request){
+        logger.trace("placeOrder Controller called");
+        return new ResponseEntity<>(orderService.placeOrder(orderDTO,request),HttpStatus.OK);
     }
 
     @GetMapping
