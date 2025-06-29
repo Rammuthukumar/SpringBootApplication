@@ -41,7 +41,7 @@ public class PublisherController {
     }
 
     @PostMapping
-    public ResponseEntity<PublisherDTO> addPublisher(@Valid @RequestBody PublisherDTO publisherDTO){
+    public ResponseEntity<?> addPublisher(@Valid @RequestBody PublisherDTO publisherDTO){
         return new ResponseEntity<>(service.addPublisher(publisherDTO),HttpStatus.OK);
     }
 

@@ -24,7 +24,8 @@ public class User {
     @Size(min = 4, max = 200, message="Password should be of length 3 to 16 chars")
     private String password;
 
-    @NotNull(message = "Role shouldnt be null")
+    private String email;
+
     private String role;
 
 }

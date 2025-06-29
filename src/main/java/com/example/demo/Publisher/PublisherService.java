@@ -33,9 +33,9 @@ public class PublisherService {
         return entityMapper.publisherToPublisherDTO(publisher);
     }
 
-    public PublisherDTO addPublisher(PublisherDTO publisherDTO){
+    public Publisher addPublisher(PublisherDTO publisherDTO){
         Publisher publisher = entityMapper.publisherDTOtoPublisher(publisherDTO);
-        return entityMapper.publisherToPublisherDTO(repo.save(publisher));
+        return repo.save(publisher);
 
     }
 

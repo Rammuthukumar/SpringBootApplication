@@ -62,7 +62,7 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(customizer -> customizer.disable())
             .authorizeHttpRequests(request -> request
-                    .requestMatchers("user/register","user/login","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
+                    .requestMatchers("/verify-otp","user/register","/user/login","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/book/**").hasAnyRole("USER", "ADMIN") // GET accessible by USER and ADMIN
                     .requestMatchers(HttpMethod.POST, "/api/book").hasRole("ADMIN")              // POST restricted to ADMIN
                     .requestMatchers(HttpMethod.PUT, "/api/book/**").hasRole("ADMIN")            // PUT restricted to ADMIN

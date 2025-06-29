@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:3000")
 public class BookController {
 
     private BookService service;
@@ -49,6 +48,8 @@ public class BookController {
     @PostMapping("/book")
     @AdminOnly           //custom annotation. referernce path : config/AdminOnly.java file.
     public ResponseEntity<?> addBook(@Valid @RequestBody BookStoreDTO bookDTO, BindingResult result) {
+        logger.trace("addBook() controller method called" + bookDTO);
+        System.out.println(bookDTO);
         BookStoreDTO bookStoreResponse = service.addBook(bookDTO);
         
         Link addedBookLink = linkTo(methodOn(BookController.class)
@@ -68,12 +69,12 @@ public class BookController {
 
         //Link allBooksLink = Link.of("/api/book/").withRel("books").withType("GET");
 
-        Link allBooksLink = linkTo(methodOn(BookController.class)
+        /* Link allBooksLink = linkTo(methodOn(BookController.class)
                             .getAllBooks(null, null, id, id, null))
                             .withRel("books")
-                            .withType("GET");
+                            .withType("GET"); */
                             
-        bookStoreResponse.add(allBooksLink);
+       // bookStoreResponse.add(allBooksLink);
 
         return new ResponseEntity<>(bookStoreResponse,HttpStatus.OK);
     }
@@ -81,6 +82,7 @@ public class BookController {
     @PutMapping("/book/{id}")
     @AdminOnly
     public ResponseEntity<?> updateBook(@Valid @PathVariable int id, @RequestBody BookStoreDTO bookDTO){
+        logger.trace("updateBook() controller method called");
         BookStoreDTO bookStoreResponse = service.updateBook(id,bookDTO);
 
         Link updatedBookLink = linkTo(methodOn(BookController.class)
@@ -96,6 +98,7 @@ public class BookController {
     @DeleteMapping("/book/{id}")
     @AdminOnly
     public ResponseEntity<?> deleteBook(@PathVariable int id){
+        logger.trace("Delete book controller method called"+id);
         return new ResponseEntity<String>(service.deleteBook(id), HttpStatus.OK);
     }
 
@@ -109,17 +112,20 @@ public class BookController {
     @GetMapping("/book")
     public ResponseEntity<?> getAllBooks(
         @RequestParam(required=false) String bookName, @RequestParam(required=false) String authorName,
-        @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue="10") int size,
-        @RequestParam(defaultValue = "id") String sort ) {
-       
-        Pageable pageable = PageRequest.of(page,size,Sort.by(sort).ascending());
+        @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue = "25") int size,
+        @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue="asc") String order ) {
+        
+        Sort sortOrder = order.equalsIgnoreCase("desc") ? Sort.by(sort).descending() : Sort.by(sort).ascending();
+        Pageable pageable = PageRequest.of(page,size,sortOrder);
+        System.out.println(sortOrder);
+        
  
         if(bookName != null && authorName != null) 
             return new ResponseEntity<Page<BookStore>>(service.searchByBookNameAndAuthorName(bookName,authorName,pageable),HttpStatus.OK);
         else if(bookName != null)
-            return new ResponseEntity<Page<BookStore>>(service.searchByAuthor(bookName,pageable),HttpStatus.OK);
+            return new ResponseEntity<List<BookStore>>(service.searchByBook(bookName),HttpStatus.OK);
         else if(authorName != null)
-            return new ResponseEntity<Page<BookStore>>(service.searchByBook(authorName,pageable),HttpStatus.OK);
+            return new ResponseEntity<List<BookStore>>(service.searchByAuthor(authorName),HttpStatus.OK);
             
         logger.trace("getAllBooks Controller method called");
         return new ResponseEntity<List<BookStoreDTO>>(service.getAllBooks(pageable),HttpStatus.OK);

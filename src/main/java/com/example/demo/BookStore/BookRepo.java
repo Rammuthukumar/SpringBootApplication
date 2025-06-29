@@ -16,9 +16,9 @@ public interface BookRepo extends JpaRepository<BookStore, Integer> {
   @Query("SELECT b FROM BookStore b LEFT JOIN FETCH b.categories WHERE b.id = :id")
   Optional<BookStore> findByIdWithCategories(@Param("id") int id);
 
-  Page<BookStore> findByAuthorNameContainingIgnoreCase(String authorName,Pageable pageable);
+  List<BookStore> findByAuthorNameContainingIgnoreCase(String authorName);
 
-  Page<BookStore> findByBookNameContainingIgnoreCase(String bookName,Pageable pageable);
+  List<BookStore> findByBookNameContainingIgnoreCase(String bookName);
 
   List<BookStore> findByYear(int year);
 

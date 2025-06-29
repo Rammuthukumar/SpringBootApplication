@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.redis.core.RedisHash;
-
 import com.example.demo.BookStore.BookStore;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -32,4 +30,8 @@ public class Category implements Serializable{
     @ManyToMany(mappedBy = "categories")
     @JsonIgnore
     private Set<BookStore> books = new HashSet<>();
+
+    public Category(String categoryName){
+        this.categoryName = categoryName;
+    }
 }

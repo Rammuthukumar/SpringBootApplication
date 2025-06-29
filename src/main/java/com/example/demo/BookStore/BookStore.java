@@ -1,11 +1,9 @@
 package com.example.demo.BookStore;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.data.redis.core.RedisHash;
 
 import com.example.demo.Category.Category;
 import com.example.demo.Publisher.Publisher;

@@ -1,9 +1,5 @@
 package com.example.demo.Publisher;
 
-import java.io.Serializable;
-
-import org.springframework.data.redis.core.RedisHash;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

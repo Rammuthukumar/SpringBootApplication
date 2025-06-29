@@ -71,7 +71,7 @@ public class JwtService {
         return Jwts.builder()
             .setClaims(claims).setSubject(username)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000*60*10))
+            .setExpiration(new Date(System.currentTimeMillis() + 1000*60*60))
             .signWith(getKey(), SignatureAlgorithm.HS256).compact();
     }
 
@@ -79,7 +79,7 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-
+    
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
