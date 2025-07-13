@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.config.JwtService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -35,7 +36,8 @@ public class UserController {
 
     
     @PostMapping("/login")
-    public UserDTO login(@Valid @RequestBody User user){
+    public UserDTO login(@Valid @RequestBody User user, HttpServletRequest request){
+        
         Authentication authentication = authenticationManager
             .authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         if(authentication.isAuthenticated()) {

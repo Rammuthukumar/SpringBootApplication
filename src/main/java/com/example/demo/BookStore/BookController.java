@@ -24,6 +24,7 @@ import com.example.demo.config.AdminOnly;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,30 +53,21 @@ public class BookController {
         System.out.println(bookDTO);
         BookStoreDTO bookStoreResponse = service.addBook(bookDTO);
         
-        Link addedBookLink = linkTo(methodOn(BookController.class)
-                            .getBook(bookStoreResponse.getId()))
-                            .withSelfRel()
-                            .withType("GET");
+        // Link addedBookLink = linkTo(methodOn(BookController.class)
+        //                     .getBook(bookStoreResponse.getId()))
+        //                     .withSelfRel()
+        //                     .withType("GET");
 
-        bookStoreResponse.add(addedBookLink);
+       // bookStoreResponse.add(addedBookLink);
 
         return new ResponseEntity<BookStoreDTO>(bookStoreResponse,HttpStatus.CREATED);
     }
     
     // getting book by id
     @GetMapping("/book/{id}")
-    public ResponseEntity<?> getBook(@PathVariable int id){
+    public ResponseEntity<?> getBook(@PathVariable int id, HttpServletRequest request){
         BookStoreDTO bookStoreResponse = service.getBook(id);
-
-        //Link allBooksLink = Link.of("/api/book/").withRel("books").withType("GET");
-
-        /* Link allBooksLink = linkTo(methodOn(BookController.class)
-                            .getAllBooks(null, null, id, id, null))
-                            .withRel("books")
-                            .withType("GET"); */
-                            
-       // bookStoreResponse.add(allBooksLink);
-
+        request.setAttribute("bookname",bookStoreResponse.getBookName());
         return new ResponseEntity<>(bookStoreResponse,HttpStatus.OK);
     }
 
@@ -85,12 +77,12 @@ public class BookController {
         logger.trace("updateBook() controller method called");
         BookStoreDTO bookStoreResponse = service.updateBook(id,bookDTO);
 
-        Link updatedBookLink = linkTo(methodOn(BookController.class)
-                            .getBook(bookStoreResponse.getId()))
-                            .withSelfRel()
-                            .withType("GET");
+        // Link updatedBookLink = linkTo(methodOn(BookController.class)
+        //                     .getBook(bookStoreResponse.getId()))
+        //                     .withSelfRel()
+        //                     .withType("GET");
 
-        bookStoreResponse.add(updatedBookLink);
+        //bookStoreResponse.add(bookStoreResponse);
 
         return new ResponseEntity<BookStoreDTO>(bookStoreResponse,HttpStatus.OK);
     } 
@@ -110,14 +102,16 @@ public class BookController {
 
     // Paging, Sorting and filtering
     @GetMapping("/book")
-    public ResponseEntity<?> getAllBooks(
+    public ResponseEntity<?> getAllBooks( HttpServletRequest request,
         @RequestParam(required=false) String bookName, @RequestParam(required=false) String authorName,
         @RequestParam(defaultValue="0") int page, @RequestParam(defaultValue = "25") int size,
         @RequestParam(defaultValue = "id") String sort, @RequestParam(defaultValue="asc") String order ) {
         
         Sort sortOrder = order.equalsIgnoreCase("desc") ? Sort.by(sort).descending() : Sort.by(sort).ascending();
         Pageable pageable = PageRequest.of(page,size,sortOrder);
-        System.out.println(sortOrder);
+        //System.out.println(sortOrder);
+        System.out.println(request.getAuthType());
+        System.out.println(request.isSecure());
         
  
         if(bookName != null && authorName != null) 
